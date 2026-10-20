@@ -1,189 +1,152 @@
-﻿using System;
-using System.Linq;
+using System;
 
-namespace PKHeX.Core
+namespace PKHeX.Core;
+
+/// <summary>
+/// <see cref="PersonalInfo"/> table (array).
+/// </summary>
+/// <remarks>
+/// Serves as the main object that is accessed for stat data in a particular generation/game format.
+/// </remarks>
+public static class PersonalTable
 {
-    public class PersonalTable
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen9a"/>.
+    /// </summary>
+    public static readonly PersonalTable9ZA ZA = new(GetTable("za"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen9"/>.
+    /// </summary>
+    public static readonly PersonalTable9SV SV = new(GetTable("sv"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen8a"/>.
+    /// </summary>
+    public static readonly PersonalTable8LA LA = new(GetTable("la"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen8b"/>.
+    /// </summary>
+    public static readonly PersonalTable8BDSP BDSP = new(GetTable("bdsp"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen8"/>.
+    /// </summary>
+    public static readonly PersonalTable8SWSH SWSH = new(GetTable("swsh"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="EntityContext.Gen7b"/>.
+    /// </summary>
+    public static readonly PersonalTable7GG GG = new(GetTable("gg"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.USUM"/>.
+    /// </summary>
+    public static readonly PersonalTable7 USUM = new(GetTable("uu"), Legal.MaxSpeciesID_7_USUM);
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.SM"/>.
+    /// </summary>
+    public static readonly PersonalTable7 SM = new(GetTable("sm"), Legal.MaxSpeciesID_7);
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.ORAS"/>.
+    /// </summary>
+    public static readonly PersonalTable6AO AO = new(GetTable("ao"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.XY"/>.
+    /// </summary>
+    public static readonly PersonalTable6XY XY = new(GetTable("xy"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.B2W2"/>.
+    /// </summary>
+    public static readonly PersonalTable5B2W2 B2W2 = new(GetTable("b2w2"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.BW"/>.
+    /// </summary>
+    public static readonly PersonalTable5BW BW = new(GetTable("bw"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.HGSS"/>.
+    /// </summary>
+    public static readonly PersonalTable4 HGSS = new(GetTable("hgss"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.Pt"/>.
+    /// </summary>
+    public static readonly PersonalTable4 Pt = new(GetTable("pt"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.DP"/>.
+    /// </summary>
+    public static readonly PersonalTable4 DP = new(GetTable("dp"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.LG"/>.
+    /// </summary>
+    public static readonly PersonalTable3 LG = new(GetTable("lg"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.FR"/>.
+    /// </summary>
+    public static readonly PersonalTable3 FR = new(GetTable("fr"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.E"/>.
+    /// </summary>
+    public static readonly PersonalTable3 E = new(GetTable("e"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.RS"/>.
+    /// </summary>
+    public static readonly PersonalTable3 RS = new(GetTable("rs"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.C"/>.
+    /// </summary>
+    public static readonly PersonalTable2 C = new(GetTable("c"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.GS"/>.
+    /// </summary>
+    public static readonly PersonalTable2 GS = new(GetTable("gs"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.RB"/>.
+    /// </summary>
+    public static readonly PersonalTable1 RB = new(GetTable("rb"));
+
+    /// <summary>
+    /// Personal Table used in <see cref="GameVersion.YW"/>.
+    /// </summary>
+    public static readonly PersonalTable1 Y = new(GetTable("y"));
+
+    private static Memory<byte> GetTable(string game) => Util.GetBinaryResource($"personal_{game}");
+
+    static PersonalTable() // Finish Setup
     {
-        public static readonly PersonalTable SM = new PersonalTable(Util.getBinaryResource("personal_sm"), GameVersion.SM);
-        public static readonly PersonalTable AO = new PersonalTable(Util.getBinaryResource("personal_ao"), GameVersion.ORAS);
-        public static readonly PersonalTable XY = new PersonalTable(Util.getBinaryResource("personal_xy"), GameVersion.XY);
-        public static readonly PersonalTable B2W2 = new PersonalTable(Util.getBinaryResource("personal_b2w2"), GameVersion.B2W2);
-        public static readonly PersonalTable BW = new PersonalTable(Util.getBinaryResource("personal_bw"), GameVersion.BW);
-        public static readonly PersonalTable HGSS = new PersonalTable(Util.getBinaryResource("personal_hgss"), GameVersion.HGSS);
-        public static readonly PersonalTable Pt = new PersonalTable(Util.getBinaryResource("personal_pt"), GameVersion.Pt);
-        public static readonly PersonalTable DP = new PersonalTable(Util.getBinaryResource("personal_dp"), GameVersion.DP);
-        public static readonly PersonalTable LG = new PersonalTable(Util.getBinaryResource("personal_lg"), GameVersion.LG);
-        public static readonly PersonalTable FR = new PersonalTable(Util.getBinaryResource("personal_fr"), GameVersion.FR);
-        public static readonly PersonalTable E = new PersonalTable(Util.getBinaryResource("personal_e"), GameVersion.E);
-        public static readonly PersonalTable RS = new PersonalTable(Util.getBinaryResource("personal_rs"), GameVersion.RS);
-        public static readonly PersonalTable C = new PersonalTable(Util.getBinaryResource("personal_c"), GameVersion.C);
-        public static readonly PersonalTable GS = new PersonalTable(Util.getBinaryResource("personal_c"), GameVersion.GS);
-        public static readonly PersonalTable RB = new PersonalTable(Util.getBinaryResource("personal_rb"), GameVersion.RBY);
-        public static readonly PersonalTable Y = new PersonalTable(Util.getBinaryResource("personal_y"), GameVersion.RBY);
+        PopulateGen3Tutors();
+        PopulateGen4Tutors();
+    }
 
-        private static byte[][] splitBytes(byte[] data, int size)
-        {
-            byte[][] r = new byte[data.Length / size][];
-            for (int i = 0; i < data.Length; i += size)
-            {
-                r[i / size] = new byte[size];
-                Array.Copy(data, i, r[i / size], 0, size);
-            }
-            return r;
-        }
-        private PersonalTable(byte[] data, GameVersion format)
-        {
-            int size = 0;
-            switch (format)
-            {
-                case GameVersion.RBY: size = PersonalInfoG1.SIZE; break;
-                case GameVersion.GS:
-                case GameVersion.C: size = PersonalInfoG2.SIZE; break;
-                case GameVersion.RS:
-                case GameVersion.E:
-                case GameVersion.FR:
-                case GameVersion.LG: size = PersonalInfoG3.SIZE; break;
-                case GameVersion.DP:
-                case GameVersion.Pt:
-                case GameVersion.HGSS: size = PersonalInfoG4.SIZE; break;
-                case GameVersion.BW: size = PersonalInfoBW.SIZE; break;
-                case GameVersion.B2W2: size = PersonalInfoB2W2.SIZE; break;
-                case GameVersion.XY: size = PersonalInfoXY.SIZE; break;
-                case GameVersion.ORAS: size = PersonalInfoORAS.SIZE; break;
-                case GameVersion.SM: size = PersonalInfoSM.SIZE; break;
-            }
+    private static void PopulateGen3Tutors()
+    {
+        // Enable Gen3 data with Emerald's data, FR/LG is a subset of Emerald's compatibility.
+        var machine = BinLinkerAccessor.Get(Util.GetBinaryResource("hmtm_g3.pkl"), "g3"u8);
+        var tutors = BinLinkerAccessor.Get(Util.GetBinaryResource("tutors_g3.pkl"), "g3"u8);
+        E.LoadTables(machine, tutors);
+        FR.CopyTables(E);
+        LG.CopyTables(E);
+        RS.CopyTables(E);
+    }
 
-            if (size == 0)
-            { Table = null; return; }
-
-            byte[][] entries = splitBytes(data, size);
-            PersonalInfo[] d = new PersonalInfo[data.Length / size];
-
-            switch (format)
-            {
-                case GameVersion.RBY:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoG1(entries[i]);
-                    break;
-                case GameVersion.GS:
-                case GameVersion.C:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoG2(entries[i]);
-                    break;
-                case GameVersion.RS:
-                case GameVersion.E:
-                case GameVersion.FR:
-                case GameVersion.LG:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoG3(entries[i]);
-                    break;
-                case GameVersion.DP:
-                case GameVersion.Pt:
-                case GameVersion.HGSS:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoG4(entries[i]);
-                    break;
-                case GameVersion.BW:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoBW(entries[i]);
-                    break;
-                case GameVersion.B2W2:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoB2W2(entries[i]);
-                    break;
-                case GameVersion.XY:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoXY(entries[i]);
-                    break;
-                case GameVersion.ORAS:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoORAS(entries[i]);
-                    break;
-                case GameVersion.SM:
-                    for (int i = 0; i < d.Length; i++)
-                        d[i] = new PersonalInfoSM(entries[i]);
-                    break;
-            }
-            Table = d;
-        }
-
-        private readonly PersonalInfo[] Table;
-        public PersonalInfo this[int index]
-        {
-            get
-            {
-                if (index < Table.Length)
-                    return Table[index];
-                return Table[0];
-            }
-            set
-            {
-                if (index < Table.Length)
-                    return;
-                Table[index] = value; 
-            }
-        }
-
-        public int[] getAbilities(int species, int forme)
-        {
-            if (species >= Table.Length)
-            { species = 0; Console.WriteLine("Requested out of bounds SpeciesID"); }
-            return this[getFormeIndex(species, forme)].Abilities;
-        }
-        public int getFormeIndex(int species, int forme)
-        {
-            if (species >= Table.Length)
-            { species = 0; Console.WriteLine("Requested out of bounds SpeciesID"); }
-            return this[species].FormeIndex(species, forme);
-        }
-        public PersonalInfo getFormeEntry(int species, int forme)
-        {
-            return this[getFormeIndex(species, forme)];
-        }
-
-        public int TableLength => Table.Length;
-        public string[][] getFormList(string[] species, int MaxSpecies)
-        {
-            string[][] FormList = new string[MaxSpecies+1][];
-            for (int i = 0; i <= MaxSpecies; i++) //Hardcode 721 species + null
-            {
-                int FormCount = this[i].FormeCount;
-                FormList[i] = new string[FormCount];
-                if (FormCount <= 0) continue;
-                FormList[i][0] = species[i];
-                for (int j = 1; j < FormCount; j++)
-                {
-                    FormList[i][j] = $"{species[i]} " + j;
-                }
-            }
-
-            return FormList;
-        }
-        public string[] getPersonalEntryList(string[][] AltForms, string[] species, int MaxSpecies, out int[] baseForm, out int[] formVal)
-        {
-            string[] result = new string[Table.Length];
-            baseForm = new int[result.Length];
-            formVal = new int[result.Length];
-            for (int i = 0; i <= MaxSpecies; i++)
-            {
-                result[i] = species[i];
-                if (AltForms[i].Length == 0) continue;
-                int altformpointer = this[i].FormStatsIndex;
-                if (altformpointer <= 0) continue;
-                for (int j = 1; j < AltForms[i].Length; j++)
-                {
-                    int ptr = altformpointer + j - 1;
-                    baseForm[ptr] = i;
-                    formVal[ptr] = j;
-                    result[ptr] = AltForms[i][j];
-                }
-            }
-            return result;
-        }
-        public bool IsValidTypeCombination(int Type1, int Type2)
-        {
-            return Table.Any(p => p.Types[0] == Type1 && p.Types[1] == Type2);
-        }
+    private static void PopulateGen4Tutors()
+    {
+        var tutors = BinLinkerAccessor.Get(Util.GetBinaryResource("tutors_g4.pkl"), "g4"u8);
+        HGSS.LoadTables(tutors);
     }
 }
